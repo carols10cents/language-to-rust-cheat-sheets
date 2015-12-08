@@ -32,8 +32,6 @@ const myThing = "thing";
 myThing = "bar"; // throws because of redefinition attempt! 
 ```
 
-```
-
 ### Scoped variables 
 
 ```JS
@@ -92,7 +90,7 @@ const myThing{
     return aList.map(item => item + "_changed!")
   }
 }
-
+```
 
 ### Currying functions
 
@@ -104,8 +102,6 @@ function adder(a){
 const add5 = adder(5)
 console.log(add5(4)); // returns 9 
 console.log(add5(2)); // returns 7 
-```
-
 ```
 
 ## Exception handling
