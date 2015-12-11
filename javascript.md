@@ -84,10 +84,10 @@ if(aCondition){
 Autobinding of "this" scope via fat arrow syntax
 
 ```JS
-const myList = 
-const myThing{
+const myList = ["a", "b", "c"]; 
+const myThing {
   changeList(aList){
-    return aList.map(item => item + "_changed!")
+    return aList.map(item => item + "_changed!");
   }
 }
 ```
