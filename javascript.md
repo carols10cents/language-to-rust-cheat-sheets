@@ -46,10 +46,10 @@ Rust:
 JavaScript:
 
 ```JS
-if(aCondition){
-  let thing = ""
+if(true) {
+  let thing = "";
 }
-thing; //throws, undefined
+let bar = thing; // throws, undefined
 ```
 
 Rust:
@@ -94,8 +94,8 @@ var doSomething = function (some_argument) {
   return some_argument + 1;
 }
 
-if(aCondition){
-  doSomething();
+if(true) {
+  doSomething(3);
 }
 ```
 
@@ -112,12 +112,22 @@ JavaScript:
 Autobinding of "this" scope via fat arrow syntax
 
 ```JS
-const myList = ["a", "b", "c"];
-const myThing {
-  changeList(aList){
-    return aList.map(item => item + "_changed!");
+var jane = {
+  name: "Jane",
+
+  logHello: function (friends) {
+    // If we instead made this `friends.forEach(function(friend) { ... })`, the output
+    // would be undefined since `this` would be scoped to the inner function.
+    friends.forEach((friend) => {
+      console.log(this.name + " says hello to " + friend)
+    });
   }
 }
+
+jane.logHello(["John", "Sue"]);
+// output:
+// Jane says hello to John
+// Jane says hello to Sue
 ```
 
 Rust:
@@ -131,13 +141,13 @@ Rust:
 JavaScript:
 
 ```JS
-function adder(a){
+function adder(a) {
   return b => a + b;
 }
 
-const add5 = adder(5)
-console.log(add5(4)); // returns 9
-console.log(add5(2)); // returns 7
+const add5 = adder(5);
+console.log(add5(4)); // outputs 9
+console.log(add5(2)); // outputs 7
 ```
 
 Rust:
@@ -151,11 +161,11 @@ Rust:
 JavaScript:
 
 ```JS
-try{
+try {
   notAFunction();
-}catch(err){
-  console.log(err)
-  throw err;
+} catch(err) {
+  console.log(err); // outputs ReferenceError: notAFunction is not defined
+  throw err; // rethrows
 }
 ```
 
@@ -266,8 +276,8 @@ println!("{}", i[1]); // outputs b
 JavaScript:
 
 ```js
-let list = [1,2,3];
-list.length; //3
+let list = [1, 2, 3];
+console.log(list.length); // outputs 3
 ```
 
 Rust:
@@ -281,8 +291,8 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-list.join("-"); "1-2-3";
+let list = [1, 2, 3];
+console.log(list.join("-")); // outputs "1-2-3"
 ```
 
 Rust:
@@ -296,8 +306,8 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-list.reverse(); //[3,2,1]
+let list = [1, 2, 3];
+console.log(list.reverse()); // outputs [3, 2, 1]
 ```
 
 Rust:
@@ -311,11 +321,11 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,3,2];
-list.sort(); //[1,2,3]
+let list = [1, 3, 2];
+console.log(list.sort()); // outputs [1, 2, 3]
 
-let list2 = [{foo: 1},{foo: 3},{foo: 2}]
-list.sort((prev, next) => prev.foo > next.foo)
+let list2 = [{foo: 1}, {foo: 3}, {foo: 2}]
+console.log(list2.sort((prev, next) => prev.foo > next.foo)); // outputs [{foo: 1}, {foo: 2}, {foo: 3}]
 ```
 
 Rust:
@@ -329,8 +339,9 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-list.push(4); //adds 4
+let list = [1, 2, 3];
+list.push(4);
+console.log(list); // outputs [1, 2, 3, 4]
 ```
 
 Rust:
@@ -344,8 +355,10 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-let value = list.pop(); //mutates list to [1,2]
+let list = [1, 2, 3];
+let value = list.pop(); // mutates list to [1, 2]
+console.log(value); // outputs 3
+console.log(list); // outputs [1, 2]
 ```
 
 Rust:
@@ -359,7 +372,10 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
+let list = [1, 2, 3];
+let value = list.shift();
+console.log(value); // outputs 1
+console.log(list); // outputs [2, 3]
 ```
 
 Rust:
@@ -373,7 +389,10 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
+let list = [1, 2, 3];
+let value = list.unshift(4);
+console.log(value); // outputs 4
+console.log(list); // outputs [4, 1, 2, 3]
 ```
 
 Rust:
@@ -387,8 +406,9 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-let newList = list.concat([4,5,6]); // [1,2,3,4,5,6]
+let list = [1, 2, 3];
+let newList = list.concat([4, 5, 6]);
+console.log(newList); // outputs [1, 2, 3, 4, 5, 6]
 ```
 
 Rust:
@@ -402,11 +422,11 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3,1];
-list.indexOf(2); // 1
+let list = [1, 2, 3, 1];
+console.log(list.indexOf(2)); // outputs 1
 
 // using `from` argument
-list.indexOf(1, 2); // 3
+console.log(list.indexOf(1, 2)); // outputs 3
 ```
 
 Rust:
@@ -420,8 +440,8 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-list.forEach(item => console.log(i));
+let list = [1, 2, 3];
+list.forEach(item => console.log(item));
 ```
 
 Rust:
@@ -435,8 +455,9 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
+let list = [1, 2, 3];
 let newList = list.map(x => x * x);
+console.log(newList); // outputs [1, 4, 9]
 ```
 
 Rust:
@@ -450,8 +471,8 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1, "a", 2, "b" ,3];
-list.filter(item => typeof item === "string"); //["a", "b"]
+let list = [1, "a", 2, "b", 3];
+console.log(list.filter(item => typeof item === "string")); // outputs ["a", "b"]
 ```
 
 Rust:
@@ -465,8 +486,9 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-list.reduce()
+let list = [1, 2, 3];
+console.log(list.reduce((prev, curr) => prev - curr)); // outputs -4
+console.log(list.reduceRight((prev, curr) => prev - curr)); // outputs 0
 ```
 
 Rust:
@@ -480,8 +502,9 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-list.some((item) => item === 2); // true
+let list = [1, 2, 3];
+console.log(list.some((item) => item === 2)); // outputs true
+console.log(list.some((item) => item < 0)); // outputs false
 ```
 
 Rust:
@@ -495,8 +518,9 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-list.every((item) => item > 0); // true
+let list = [1, 2, 3];
+console.log(list.every((item) => item > 0)); // outputs true
+console.log(list.every((item) => item % 2 === 0)); // outputs false
 ```
 
 Rust:
@@ -510,9 +534,11 @@ Rust:
 JavaScript:
 
 ```js
-let list = [{foo: 1},{foo: 3},{foo: 2}];
-let obj3 = list2.find(item => item.foo === 2);
-let index = list2.findIndex(item => item.foo === 3); // 2
+let list = [{foo: 1}, {foo: 3}, {foo: 2}];
+let obj3 = list.find(item => item.foo === 2);
+console.log(obj3); // outputs {foo: 2}
+let index = list.findIndex(item => item.foo === 3);
+console.log(index); // outputs 1
 ```
 
 Rust:
@@ -526,7 +552,8 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1, 2, 3].fill(4); // [4, 4, 4]
+let list = [1, 2, 3].fill(4);
+console.log(list); // outputs [4, 4, 4]
 ```
 
 Rust:
@@ -540,10 +567,23 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1,2,3];
-for(let item of list.entries()){
-  console.log(entries);
+let list = ["a", "b", , "c"];
+for(let item of list.entries()) {
+  console.log(item);
 }
+// outputs:
+// [0, "a"]
+// [1, "b"]
+// [2, undefined]
+// [3, "c"]
+for(let item of list.keys()) {
+  console.log(item);
+}
+// outputs:
+// 0
+// 1
+// 2
+// 3
 ```
 
 Rust:
@@ -554,11 +594,11 @@ Rust:
 
 ### includes
 
-JavaScript:
+JavaScript (ES7):
 
 ```js
-let list = [1,2,3];
-list.includes(2); //true
+let list = [1, 2, 3];
+console.log(list.includes(2)); // outputs true
 ```
 
 Rust:
@@ -592,7 +632,7 @@ for j in i {
 JavaScript:
 
 ```js
-// TODO
+console.log(Array.from("foo")); // outputs ["f", "o", "o"]
 ```
 
 Rust:
@@ -622,10 +662,11 @@ Rust:
 JavaScript:
 
 ```JS
-let list = ["", ,"foo", 1, 2, 3];
-list.filter(item => typeof item === "number")
+let list = ["", , "foo", 1, 2, 3];
+let result = list.filter(item => typeof item === "number")
   .map(item => item * item)
-  .reduce()
+  .reduce((prev, curr) => prev + curr);
+console.log(result); // outputs 14
 ```
 
 Rust:
@@ -639,14 +680,28 @@ Rust:
 JavaScript:
 
 ```
-const resolved = Promise.resolve("value");
-const rejected = Promise.reject("value");
-const promises = Promise((resolve, reject)=>{
-  if(someCondition){
+let resolvedPromise = Promise.resolve("value1");
+let rejectedPromise = Promise.reject("value2");
+let promise = new Promise((resolve, reject) => {
+  if(true) {
     return resolve("yay!")
   }
   reject("boo!")
 });
+Promise.all([
+  resolvedPromise,
+  promise
+]).then((values) => console.log("Then: " + values))
+  .catch((values) => console.log("Catch: " + values));
+// outputs "Then: value1,yay!"
+
+Promise.all([
+  resolvedPromise,
+  rejectedPromise,
+  promise
+]).then((values) => console.log("Then: " + values))
+  .catch((values) => console.log("Catch: " + values));
+// outputs "Catch: value2"
 ```
 
 Rust:
@@ -660,13 +715,14 @@ Rust:
 JavaScript:
 
 ```JS
-function* idGenerator(key){
-  while(true){
+function* idGenerator(key) {
+  while(true) {
     yield key + "-" + Math.random();
   }
 }
-let idMaker = idGenerator("Foo");
-let id = idGenetor.next().value; //e.g., "foo-0.1325556532963984"
+let idMaker = idGenerator("foo");
+let id = idMaker.next().value;
+console.log(id); // outputs, e.g., "foo-0.1325556532963984"
 ```
 
 Rust:
@@ -693,16 +749,16 @@ Rust:
 
 ## Async programming - async and await
 
-JavaScript:
+JavaScript (ES7):
 
 ```JS
-async getData function(url){
-  const response = await fetch(url)
-  const data = await data.json();
+async function getData(url) {
+  const response = await fetch(url);
+  const data = await response.json();
   return data;
 }
 
-getData.then(data).catch(err => console.log("oh no!", err));
+getData("https://api.github.com").then(data).catch(err => console.log("oh no!", err));
 ```
 
 Rust:
@@ -718,7 +774,7 @@ JavaScript:
 ```JS
 const obj = {"a": "b"};
 const str = JSON.stringify(obj);
-const newObj = JSON.parse(srt);
+const newObj = JSON.parse(str);
 ```
 
 Rust:
@@ -746,20 +802,20 @@ Rust:
 JavaScript:
 
 ```JS
-function MySuperThing(){
+function MySuperThing() {
   MyThing.call(MyThing);
 }
-function MyThing(){}
+function MyThing() {}
 
 MyThing.prototype = {
-  doThing(){
-    console.log("doing thing!")
+  doThing() {
+    console.log("doing thing!");
   }
-  get foo(){
+  get foo() {
   }
   _bar: null;
-  get bar(){}
-  set bar(value){
+  get bar() {}
+  set bar(value) {
 
   }
 };
@@ -778,7 +834,7 @@ Rust:
 JavaScript:
 
 ```JS
-function foo({x="hi"} = {}){
+function foo({x="hi"} = {}) {
   x;
 }
 
@@ -841,7 +897,7 @@ JavaScript:
 
 ```
 const map = new Map([["a", "b"]]);
-map.size; //1
+map.size; // 1
 map.get("a"); // "b"
 map.has("a"); // true
 map.set("c", "d");
@@ -889,13 +945,13 @@ JavaScript:
 
 ```JS
 const set = new Set(["a", "b", "c"]);
-set.size; //3
-set.has("d"); //false
+set.size; // 3
+set.has("d"); // false
 set.add("d");
 set.delete("a");
-for(let entry of set.entries()){console.log(entry);}
-for(let value of set.values()){console.log(value);}
-for(let keys of set.keys()){console.log(keys);}
+for(let entry of set.entries()){ console.log(entry); }
+for(let value of set.values()){ console.log(value); }
+for(let keys of set.keys()){ console.log(keys); }
 set.clear();
 ```
 
@@ -914,8 +970,8 @@ const obj1 = {};
 const obj2 = {};
 const obj3 = {};
 const weakSet = new WeakSet([obj1, obj2]);
-weakSet.add(obj3)
-weakSet.delete(obj1)
+weakSet.add(obj3);
+weakSet.delete(obj1);
 weakSet.has(obj1) // false
 weakSet.clear();
 ```
@@ -932,8 +988,8 @@ JavaScript:
 
 ```JS
 let name = "Marcos";
-//e.g., My name is Marcos and today is Tue, 08 Dec 2015 21:27:00 GMT
 let b = `My name is ${name} and today is ${new Date().toUTCString()}`;
+console.log(b); // outputs, e.g., My name is Marcos and today is Tue, 08 Dec 2015 21:27:00 GMT
 ```
 
 Rust:
@@ -976,10 +1032,10 @@ Rust:
 JavaScript:
 
 ```JS
-let whatever = {x: "hi", y: "hello", "z": hello}
-const {x, ...props} = whaterver;
-x; // "hi"
-props; //{y: "hello", "z": hello};
+let whatever = {x: "hi", y: "hello", "z": hello};
+const {x, ...props} = whatever;
+console.log(x); // outputs "hi"
+console.log(props); // outputs {y: "hello", "z": hello}
 ```
 
 Rust:
@@ -993,7 +1049,7 @@ Rust:
 JavaScript:
 
 ```JS
-let values = [1,2,3];
+let values = [1, 2, 3];
 let newList = [x * x for x of values];
 ```
 
