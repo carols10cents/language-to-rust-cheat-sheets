@@ -19,6 +19,8 @@ something_that_varies += 1;
 
 Rust:
 
+Note that the concept of "hoisting" doesn't really exist in Rust; all variable bindings are scoped. See the [Variable Bindings section of the book](http://doc.rust-lang.org/book/variable-bindings.html) for more details.
+
 ```rust
 let foo = 1;
 let bar = "hi";
@@ -37,8 +39,11 @@ myThing = "bar"; // throws because of redefinition attempt!
 
 Rust:
 
+Note that by default, variables declared with `let` are immutable by default unless you use the `mut` keyword -- see the [Mutability section of the book](http://doc.rust-lang.org/book/mutability.html). Rust *also* has `const` and `static` that have different semantics than an immutable variable binding. See the [Const and Static section of the book](http://doc.rust-lang.org/book/const-and-static.html) for more detail.
+
 ```rust
-// TODO
+const my_thing: i32 = 1;
+my_thing = 2; // throws with error: invalid left-hand side expression
 ```
 
 ### Scoped variables
@@ -55,7 +60,11 @@ let bar = thing; // throws, undefined
 Rust:
 
 ```rust
-// TODO
+if true {
+  let thing = "";
+}
+
+let bar = thing; // error: unresolved name `thing`
 ```
 
 ## Functions
@@ -102,8 +111,16 @@ if(true) {
 Rust:
 
 ```rust
-// TODO
+let do_something = |some_argument: i32| {
+  some_argument + 1
+};
+
+if true {
+  do_something(3);
+}
 ```
+
+Also see [the closures section of the book](http://doc.rust-lang.org/book/closures.html).
 
 ### Fat arrow and auto binding
 
@@ -132,8 +149,26 @@ jane.logHello(["John", "Sue"]);
 
 Rust:
 
+Note that Rust doesn't bind a context/scope like JavaScript does, so there isn't a need for a fat arrow syntax to opt out of the `this` binding.
+
 ```rust
-// TODO
+struct Jane {
+    name: String,
+}
+
+impl Jane {
+    fn log_hello(self, friends: Vec<&str>) -> String {
+        friends.iter().map(|friend| {
+            format!("{} says hello to {}", self.name, friend)
+        }).collect::<Vec<_>>().join("\n")
+    }
+}
+
+let j = Jane { name: String::from("Jane") };
+println!("{}", j.log_hello(vec!["John", "Sue"]));
+// output:
+// Jane says hello to John
+// Jane says hello to Sue
 ```
 
 ### Currying functions
