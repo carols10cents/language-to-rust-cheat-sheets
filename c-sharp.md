@@ -20,7 +20,7 @@ somethingThatVaries += 1;
 Rust:
 
 ```rust
-let foo = 1i;
+let foo = 1;
 let bar = "hi";
 let mut something_that_varies = 2;
 something_that_varies += 1;
@@ -45,7 +45,7 @@ Rust:
 
 ```rust
 // Function definition: takes an integer argument, returns an integer
-fn do_something(some_argument: int) -> int {
+fn do_something(some_argument: i32) -> i32 {
     some_argument + 1 // no semicolon in implicit return statements
 }
 
@@ -170,7 +170,7 @@ Rust:
 
 ```rust
 let i = vec!["a", "b", "c"];
-for j in i.iter() {
+for j in i {
     println!("{}", j);
 }
 ```
@@ -220,7 +220,7 @@ class Highway {
     this.Length = length;
     this.SpeedLimit = speedLimit;
   }
-  
+
   public int TimeToTravel() {
     return Length / SpeedLimit;
   }
@@ -233,12 +233,12 @@ Rust:
 
 ```rust
 struct Highway {
-    length: int,
-    speed_limit: int,
+    length: i32,
+    speed_limit: i32,
 }
 
 impl Highway {
-    fn time_to_travel(&self) -> int {
+    fn time_to_travel(&self) -> i32 {
         self.length / self.speed_limit
     }
 }

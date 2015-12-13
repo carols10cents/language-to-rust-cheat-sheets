@@ -20,7 +20,7 @@ something_that_varies += 1;
 Rust:
 
 ```rust
-let foo = 1i;
+let foo = 1;
 let bar = "hi";
 let mut something_that_varies = 2;
 something_that_varies += 1;
@@ -77,7 +77,7 @@ Rust:
 
 ```rust
 // Function definition: takes an integer argument, returns an integer
-fn do_something(some_argument: int) -> int {
+fn do_something(some_argument: i32) -> i32 {
     some_argument + 1 // no semicolon in implicit return statements
 }
 
@@ -582,7 +582,7 @@ Rust:
 
 ```rust
 let i = vec!["a", "b", "c"];
-for j in i.iter() {
+for j in i {
     println!("{}", j);
 }
 ```
