@@ -84,6 +84,8 @@ var results = do_something(3);
 
 Rust:
 
+Note again that the concept of "hoisting" doesn't really exist in Rust; all function definitions are scoped.
+
 ```rust
 // Function definition: takes an integer argument, returns an integer
 fn do_something(some_argument: i32) -> i32 {
@@ -129,7 +131,7 @@ JavaScript:
 Autobinding of "this" scope via fat arrow syntax
 
 ```JS
-var jane = {
+var person = {
   name: "Jane",
 
   logHello: function (friends) {
@@ -141,7 +143,7 @@ var jane = {
   }
 }
 
-jane.logHello(["John", "Sue"]);
+person.logHello(["John", "Sue"]);
 // output:
 // Jane says hello to John
 // Jane says hello to Sue
@@ -152,11 +154,11 @@ Rust:
 Note that Rust doesn't bind a context/scope like JavaScript does, so there isn't a need for a fat arrow syntax to opt out of the `this` binding.
 
 ```rust
-struct Jane {
+struct Person {
     name: String,
 }
 
-impl Jane {
+impl Person {
     fn log_hello(self, friends: Vec<&str>) -> String {
         friends.iter().map(|friend| {
             format!("{} says hello to {}", self.name, friend)
@@ -164,7 +166,7 @@ impl Jane {
     }
 }
 
-let j = Jane { name: String::from("Jane") };
+let j = Person { name: String::from("Jane") };
 println!("{}", j.log_hello(vec!["John", "Sue"]));
 // output:
 // Jane says hello to John
@@ -187,27 +189,43 @@ console.log(add5(2)); // outputs 7
 
 Rust:
 
+See [the section on closures from the book](http://doc.rust-lang.org/book/closures.html) for more info.
+
 ```rust
-// TODO
+fn adder(a: i32) -> Box<Fn(i32) -> i32> {
+    Box::new(move |b| a + b)
+}
+
+let add5 = adder(5);
+println!("{}", add5(4)); // outputs 9
+println!("{}", add5(2)); // outputs 7
 ```
 
 ## Exception handling
+
+Exception handling in JavaScript is done using `try`/`catch` blocks and throwing and catching exceptions. Rust, however, does not throw exceptions-- instead, it has a `Result` value that can either be `Ok` or `Err` and you must explicitly handle both cases.
+
+It turns out there are very few situations where JavaScript throws an exception and the Rust standard library returns a `Result`! Many cases where JavaScript throws an exception are compile-time errors in Rust. In many cases where Rust returns a `Result`, JavaScript would return `NaN` or similar non-exception values. There are crates that, for example, do parsing of dates or JSON that return `Result`s, but then the code wouldn't be easily runnable on [play.rust-lang.org](https://play.rust-lang.org/), and that's just not as fun :)
 
 JavaScript:
 
 ```JS
 try {
-  notAFunction();
-} catch(err) {
-  console.log(err); // outputs ReferenceError: notAFunction is not defined
-  throw err; // rethrows
+  let s = String.fromCodePoint(-1);
+} catch (e) {
+  console.log(e); // outputs "RangeError: -1 is not a valid code point"
+  throw e
 }
 ```
 
 Rust:
 
 ```rust
-// TODO
+match String::from_utf16(&[55296]) {
+    Ok(s) => println!("Got a valid string: {}", s),
+    Err(e) => println!("Got an error: {}", e),
+}
+// outputs "Got an error: invalid utf-16: lone surrogate found"
 ```
 
 ## Conditionals
@@ -318,7 +336,8 @@ console.log(list.length); // outputs 3
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+println!("{}", list.len()); // outputs 3
 ```
 
 ### join
@@ -333,7 +352,12 @@ console.log(list.join("-")); // outputs "1-2-3"
 Rust:
 
 ```rust
-// TODO
+let list = vec!["1", "2", "3"];
+println!("{}", list.join("-")); // outputs "1-2-3"
+
+// Rust is stricter about types; to do this on a list of integers we need to do:
+let list2 = vec![1, 2, 3];
+println!("{}", list2.iter().map(|x| format!("{}", x)).collect::<Vec<_>>().join("-"));
 ```
 
 ### reverse
@@ -348,7 +372,9 @@ console.log(list.reverse()); // outputs [3, 2, 1]
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 2, 3];
+list.reverse();
+println!("{:?}", list); // outputs [3, 2, 1]
 ```
 
 ### sort
@@ -366,7 +392,11 @@ console.log(list2.sort((prev, next) => prev.foo > next.foo)); // outputs [{foo: 
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 3, 2];
+list.sort();
+println!("{:?}", list); // outputs [1, 2, 3]
+
+// TODO: struct sorting
 ```
 
 ### push
@@ -382,7 +412,9 @@ console.log(list); // outputs [1, 2, 3, 4]
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 3, 2];
+list.push(4);
+println!("{:?}", list); // outputs [1, 2, 3, 4]
 ```
 
 ### pop
@@ -399,7 +431,10 @@ console.log(list); // outputs [1, 2]
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 2, 3];
+let value = list.pop(); // mutates list to [1, 2]
+println!("{:?}", value); // outputs Some(3)
+println!("{:?}", list); // outputs [1, 2]
 ```
 
 ### shift
@@ -415,8 +450,13 @@ console.log(list); // outputs [2, 3]
 
 Rust:
 
+See [Issue #10852](https://github.com/rust-lang/rust/issues/10852) if you're interested in the discussion of why Rust doesn't have shift/unshift.
+
 ```rust
-// TODO
+let mut list = vec![1, 2, 3];
+let value = list.remove(0);
+println!("{:?}", value); // outputs 1
+println!("{:?}", list); // outputs [2, 3]
 ```
 
 ### unshift
@@ -433,7 +473,9 @@ console.log(list); // outputs [4, 1, 2, 3]
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 2, 3];
+list.insert(0, 4);
+println!("{:?}", list); // outputs [4, 1, 2, 3]
 ```
 
 ### concat
@@ -443,16 +485,21 @@ JavaScript:
 ```js
 let list = [1, 2, 3];
 let newList = list.concat([4, 5, 6]);
+console.log(list); // outputs [1, 2, 3]
 console.log(newList); // outputs [1, 2, 3, 4, 5, 6]
 ```
 
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+let mut new_list = list.clone();
+new_list.extend(vec![4, 5, 6]);
+println!("{:?}", list); // outputs [1, 2, 3]
+println!("{:?}", new_list); // outputs [1, 2, 3, 4, 5, 6]
 ```
 
-### lastIndexOf and indexOf
+### indexOf
 
 JavaScript:
 
@@ -467,7 +514,8 @@ console.log(list.indexOf(1, 2)); // outputs 3
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3, 1];
+println!("{:?}", list.iter().position(|x| *x == 2)); // outputs Some(1)
 ```
 
 ### forEach
