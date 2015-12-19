@@ -87,7 +87,13 @@ Rust:
 Note again that the concept of "hoisting" doesn't really exist in Rust; all function definitions are scoped.
 
 ```rust
-// Function definition: takes an integer argument, returns an integer
+// A function definition consists of:
+// fn [function name]([argument list, consisting of name: type pairs]) -> [return type] {}
+// So this function, named do_something, takes one argument named some_argument that is of type i32,
+// and returns an i32.
+// Since Rust is a systems language, you do have to think about and specify how much space you
+// want your number types to take up-- i32 is a reasonable default, [see the rest in the reference](https://doc.rust-lang.org/nightly/reference.html#integer-literals).
+
 fn do_something(some_argument: i32) -> i32 {
     some_argument + 1 // no semicolon in implicit return statements
 }
@@ -112,7 +118,11 @@ if(true) {
 
 Rust:
 
+[See the closures section of the book](http://doc.rust-lang.org/book/closures.html).
+
 ```rust
+// Closures/anonymous functions/lambdas are functions whose arguments are specified within pipes
+// (|...|), still in argument name/type pairs, followed by the function definition.
 let do_something = |some_argument: i32| {
   some_argument + 1
 };
@@ -122,7 +132,6 @@ if true {
 }
 ```
 
-Also see [the closures section of the book](http://doc.rust-lang.org/book/closures.html).
 
 ### Fat arrow and auto binding
 
@@ -158,9 +167,12 @@ struct Person {
     name: String,
 }
 
+// impl is short for implementation and is where you define methods on a struct.
 impl Person {
     fn log_hello(self, friends: Vec<&str>) -> String {
         friends.iter().map(|friend| {
+            // format! is a macro that works similarly to printf in C.
+            // http://doc.rust-lang.org/nightly/std/fmt/index.html
             format!("{} says hello to {}", self.name, friend)
         }).collect::<Vec<_>>().join("\n")
     }
@@ -317,6 +329,9 @@ console.log(i[1]); // outputs b
 Rust:
 
 ```rust
+// vec! is a macro that makes defining `Vec`s (vectors) easier and more similar to the syntax
+// for defining arrays. Arrays in Rust have a fixed size, so if you don't know how many elements
+// you will have at compile time, you should use a Vec.
 let i = vec!["a", "b", "c"];
 i.push("d");
 println!("{}", i[1]); // outputs b
