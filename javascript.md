@@ -411,7 +411,15 @@ let mut list = vec![1, 3, 2];
 list.sort();
 println!("{:?}", list); // outputs [1, 2, 3]
 
-// TODO: struct sorting
+// an annotation that automatically implements the Debug trait for our struct, which lets us
+// use "{:?}" in println!
+#[derive(Debug)]
+struct Bar {
+  foo: i32,
+}
+let mut list2 = vec![Bar {foo: 1}, Bar {foo: 3}, Bar {foo: 2}];
+list2.sort_by(|a, b| a.foo.cmp(&b.foo));
+println!("{:?}", list2); // outputs [Bar { foo: 1 }, Bar { foo: 2 }, Bar { foo: 3 }]
 ```
 
 ### push
@@ -545,7 +553,10 @@ list.forEach(item => console.log(item));
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+for item in list {
+  println!("{}", item);
+}
 ```
 
 ### map
@@ -561,7 +572,12 @@ console.log(newList); // outputs [1, 4, 9]
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+let new_list = list.iter().map(|x| x * x);
+// Iterators are lazy, so we have to consume them. One way is using
+// `for i in list`, which has been used in other examples; using
+// `collect` is another way.
+println!("{:?}", new_list.collect::<Vec<_>>()); // outputs [1, 4, 9]
 ```
 
 ### filter
@@ -569,14 +585,15 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1, "a", 2, "b", 3];
-console.log(list.filter(item => typeof item === "string")); // outputs ["a", "b"]
+let list = [1, 2, 3, 4, 5];
+console.log(list.filter(item => item % 2 === 0)); // outputs [2, 4]
 ```
 
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3, 4, 5];
+println!("{:?}", list.iter().filter(|item| *item % 2 == 0).collect::<Vec<_>>()); // outputs [2, 4]
 ```
 
 ### reduce and reduceRight
