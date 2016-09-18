@@ -19,6 +19,8 @@ something_that_varies += 1;
 
 Rust:
 
+Note that the concept of "hoisting" doesn't really exist in Rust; all variable bindings are scoped. See the [Variable Bindings section of the book](http://doc.rust-lang.org/book/variable-bindings.html) for more details.
+
 ```rust
 let foo = 1;
 let bar = "hi";
@@ -37,8 +39,11 @@ myThing = "bar"; // throws because of redefinition attempt!
 
 Rust:
 
+Note that by default, variables declared with `let` are immutable by default unless you use the `mut` keyword -- see the [Mutability section of the book](http://doc.rust-lang.org/book/mutability.html). Rust *also* has `const` and `static` that have different semantics than an immutable variable binding. See the [Const and Static section of the book](http://doc.rust-lang.org/book/const-and-static.html) for more detail.
+
 ```rust
-// TODO
+const my_thing: i32 = 1;
+my_thing = 2; // throws with error: invalid left-hand side expression
 ```
 
 ### Scoped variables
@@ -55,7 +60,11 @@ let bar = thing; // throws, undefined
 Rust:
 
 ```rust
-// TODO
+if true {
+  let thing = "";
+}
+
+let bar = thing; // error: unresolved name `thing`
 ```
 
 ## Functions
@@ -75,8 +84,16 @@ var results = do_something(3);
 
 Rust:
 
+Note again that the concept of "hoisting" doesn't really exist in Rust; all function definitions are scoped.
+
 ```rust
-// Function definition: takes an integer argument, returns an integer
+// A function definition consists of:
+// fn [function name]([argument list, consisting of name: type pairs]) -> [return type] {}
+// So this function, named do_something, takes one argument named some_argument that is of type i32,
+// and returns an i32.
+// Since Rust is a systems language, you do have to think about and specify how much space you
+// want your number types to take up-- i32 is a reasonable default, [see the rest in the reference](https://doc.rust-lang.org/nightly/reference.html#integer-literals).
+
 fn do_something(some_argument: i32) -> i32 {
     some_argument + 1 // no semicolon in implicit return statements
 }
@@ -101,9 +118,20 @@ if(true) {
 
 Rust:
 
+[See the closures section of the book](http://doc.rust-lang.org/book/closures.html).
+
 ```rust
-// TODO
+// Closures/anonymous functions/lambdas are functions whose arguments are specified within pipes
+// (|...|), still in argument name/type pairs, followed by the function definition.
+let do_something = |some_argument: i32| {
+  some_argument + 1
+};
+
+if true {
+  do_something(3);
+}
 ```
+
 
 ### Fat arrow and auto binding
 
@@ -112,7 +140,7 @@ JavaScript:
 Autobinding of "this" scope via fat arrow syntax
 
 ```JS
-var jane = {
+var person = {
   name: "Jane",
 
   logHello: function (friends) {
@@ -124,7 +152,7 @@ var jane = {
   }
 }
 
-jane.logHello(["John", "Sue"]);
+person.logHello(["John", "Sue"]);
 // output:
 // Jane says hello to John
 // Jane says hello to Sue
@@ -132,8 +160,29 @@ jane.logHello(["John", "Sue"]);
 
 Rust:
 
+Note that Rust doesn't bind a context/scope like JavaScript does, so there isn't a need for a fat arrow syntax to opt out of the `this` binding.
+
 ```rust
-// TODO
+struct Person {
+    name: String,
+}
+
+// impl is short for implementation and is where you define methods on a struct.
+impl Person {
+    fn log_hello(self, friends: Vec<&str>) -> String {
+        friends.iter().map(|friend| {
+            // format! is a macro that works similarly to printf in C.
+            // http://doc.rust-lang.org/nightly/std/fmt/index.html
+            format!("{} says hello to {}", self.name, friend)
+        }).collect::<Vec<_>>().join("\n")
+    }
+}
+
+let j = Person { name: String::from("Jane") };
+println!("{}", j.log_hello(vec!["John", "Sue"]));
+// output:
+// Jane says hello to John
+// Jane says hello to Sue
 ```
 
 ### Currying functions
@@ -152,27 +201,43 @@ console.log(add5(2)); // outputs 7
 
 Rust:
 
+See [the section on closures from the book](http://doc.rust-lang.org/book/closures.html) for more info.
+
 ```rust
-// TODO
+fn adder(a: i32) -> Box<Fn(i32) -> i32> {
+    Box::new(move |b| a + b)
+}
+
+let add5 = adder(5);
+println!("{}", add5(4)); // outputs 9
+println!("{}", add5(2)); // outputs 7
 ```
 
 ## Exception handling
+
+Exception handling in JavaScript is done using `try`/`catch` blocks and throwing and catching exceptions. Rust, however, does not throw exceptions-- instead, it has a `Result` value that can either be `Ok` or `Err` and you must explicitly handle both cases.
+
+It turns out there are very few situations where JavaScript throws an exception and the Rust standard library returns a `Result`! Many cases where JavaScript throws an exception are compile-time errors in Rust. In many cases where Rust returns a `Result`, JavaScript would return `NaN` or similar non-exception values. There are crates that, for example, do parsing of dates or JSON that return `Result`s, but then the code wouldn't be easily runnable on [play.rust-lang.org](https://play.rust-lang.org/), and that's just not as fun :)
 
 JavaScript:
 
 ```JS
 try {
-  notAFunction();
-} catch(err) {
-  console.log(err); // outputs ReferenceError: notAFunction is not defined
-  throw err; // rethrows
+  let s = String.fromCodePoint(-1);
+} catch (e) {
+  console.log(e); // outputs "RangeError: -1 is not a valid code point"
+  throw e
 }
 ```
 
 Rust:
 
 ```rust
-// TODO
+match String::from_utf16(&[55296]) {
+    Ok(s) => println!("Got a valid string: {}", s),
+    Err(e) => println!("Got an error: {}", e),
+}
+// outputs "Got an error: invalid utf-16: lone surrogate found"
 ```
 
 ## Conditionals
@@ -264,6 +329,9 @@ console.log(i[1]); // outputs b
 Rust:
 
 ```rust
+// vec! is a macro that makes defining `Vec`s (vectors) easier and more similar to the syntax
+// for defining arrays. Arrays in Rust have a fixed size, so if you don't know how many elements
+// you will have at compile time, you should use a Vec.
 let i = vec!["a", "b", "c"];
 i.push("d");
 println!("{}", i[1]); // outputs b
@@ -283,7 +351,8 @@ console.log(list.length); // outputs 3
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+println!("{}", list.len()); // outputs 3
 ```
 
 ### join
@@ -298,7 +367,12 @@ console.log(list.join("-")); // outputs "1-2-3"
 Rust:
 
 ```rust
-// TODO
+let list = vec!["1", "2", "3"];
+println!("{}", list.join("-")); // outputs "1-2-3"
+
+// Rust is stricter about types; to do this on a list of integers we need to do:
+let list2 = vec![1, 2, 3];
+println!("{}", list2.iter().map(|x| format!("{}", x)).collect::<Vec<_>>().join("-"));
 ```
 
 ### reverse
@@ -313,7 +387,9 @@ console.log(list.reverse()); // outputs [3, 2, 1]
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 2, 3];
+list.reverse();
+println!("{:?}", list); // outputs [3, 2, 1]
 ```
 
 ### sort
@@ -331,7 +407,19 @@ console.log(list2.sort((prev, next) => prev.foo > next.foo)); // outputs [{foo: 
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 3, 2];
+list.sort();
+println!("{:?}", list); // outputs [1, 2, 3]
+
+// an annotation that automatically implements the Debug trait for our struct, which lets us
+// use "{:?}" in println!
+#[derive(Debug)]
+struct Bar {
+  foo: i32,
+}
+let mut list2 = vec![Bar {foo: 1}, Bar {foo: 3}, Bar {foo: 2}];
+list2.sort_by(|a, b| a.foo.cmp(&b.foo));
+println!("{:?}", list2); // outputs [Bar { foo: 1 }, Bar { foo: 2 }, Bar { foo: 3 }]
 ```
 
 ### push
@@ -347,7 +435,9 @@ console.log(list); // outputs [1, 2, 3, 4]
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 3, 2];
+list.push(4);
+println!("{:?}", list); // outputs [1, 2, 3, 4]
 ```
 
 ### pop
@@ -364,7 +454,10 @@ console.log(list); // outputs [1, 2]
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 2, 3];
+let value = list.pop(); // mutates list to [1, 2]
+println!("{:?}", value); // outputs Some(3)
+println!("{:?}", list); // outputs [1, 2]
 ```
 
 ### shift
@@ -380,8 +473,13 @@ console.log(list); // outputs [2, 3]
 
 Rust:
 
+See [Issue #10852](https://github.com/rust-lang/rust/issues/10852) if you're interested in the discussion of why Rust doesn't have shift/unshift.
+
 ```rust
-// TODO
+let mut list = vec![1, 2, 3];
+let value = list.remove(0);
+println!("{:?}", value); // outputs 1
+println!("{:?}", list); // outputs [2, 3]
 ```
 
 ### unshift
@@ -398,7 +496,9 @@ console.log(list); // outputs [4, 1, 2, 3]
 Rust:
 
 ```rust
-// TODO
+let mut list = vec![1, 2, 3];
+list.insert(0, 4);
+println!("{:?}", list); // outputs [4, 1, 2, 3]
 ```
 
 ### concat
@@ -408,16 +508,21 @@ JavaScript:
 ```js
 let list = [1, 2, 3];
 let newList = list.concat([4, 5, 6]);
+console.log(list); // outputs [1, 2, 3]
 console.log(newList); // outputs [1, 2, 3, 4, 5, 6]
 ```
 
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+let mut new_list = list.clone();
+new_list.extend(vec![4, 5, 6]);
+println!("{:?}", list); // outputs [1, 2, 3]
+println!("{:?}", new_list); // outputs [1, 2, 3, 4, 5, 6]
 ```
 
-### lastIndexOf and indexOf
+### indexOf
 
 JavaScript:
 
@@ -432,7 +537,8 @@ console.log(list.indexOf(1, 2)); // outputs 3
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3, 1];
+println!("{:?}", list.iter().position(|x| *x == 2)); // outputs Some(1)
 ```
 
 ### forEach
@@ -447,7 +553,10 @@ list.forEach(item => console.log(item));
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+for item in list {
+  println!("{}", item);
+}
 ```
 
 ### map
@@ -463,7 +572,12 @@ console.log(newList); // outputs [1, 4, 9]
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+let new_list = list.iter().map(|x| x * x);
+// Iterators are lazy, so we have to consume them. One way is using
+// `for i in list`, which has been used in other examples; using
+// `collect` is another way.
+println!("{:?}", new_list.collect::<Vec<_>>()); // outputs [1, 4, 9]
 ```
 
 ### filter
@@ -471,14 +585,15 @@ Rust:
 JavaScript:
 
 ```js
-let list = [1, "a", 2, "b", 3];
-console.log(list.filter(item => typeof item === "string")); // outputs ["a", "b"]
+let list = [1, 2, 3, 4, 5];
+console.log(list.filter(item => item % 2 === 0)); // outputs [2, 4]
 ```
 
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3, 4, 5];
+println!("{:?}", list.iter().filter(|item| *item % 2 == 0).collect::<Vec<_>>()); // outputs [2, 4]
 ```
 
 ### reduce and reduceRight
