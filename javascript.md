@@ -625,7 +625,9 @@ console.log(list.some((item) => item < 0)); // outputs false
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+println!("{}", list.iter().any(|&item| item == 2)); // outputs true
+println!("{}", list.iter().any(|&item| item < 0)); // outputs false
 ```
 
 ### every
@@ -641,7 +643,9 @@ console.log(list.every((item) => item % 2 === 0)); // outputs false
 Rust:
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+println!("{}", list.iter().all(|&item| item > 0)); // outputs true
+println!("{}", list.iter().all(|&item| item % 2 == 0)); // outputs false
 ```
 
 ### find and findIndex
@@ -659,7 +663,28 @@ console.log(index); // outputs 1
 Rust:
 
 ```rust
-// TODO
+#[derive(Debug, Clone, Copy)]
+struct Foo { pub foo: i32 }
+
+let list = vec![
+    Foo { foo: 1 },
+    Foo { foo: 3 },
+    Foo { foo: 2 },
+];
+let obj3 = list.iter().find(|item| item.foo == 2);
+println!("{:?}", obj3); // outputs Some(Foo { foo: 2 })
+let index = list.iter().position(|item| item.foo == 3);
+println!("{:?}", index); // outputs Some(1)
+```
+
+Rust, but using tuples to make ad-hoc objects instead of having to define a struct:
+
+```rust
+let list = vec![("foo", 1), ("foo", 3), ("foo", 2)];
+let obj3 = list.iter().find(|(_, n)| *n == 2);
+println!("{:?}", obj3); // outputs Some(("foo", 2))
+let index = list.iter().position(|(_, n)| *n == 3);
+println!("{:?}", index); // outputs Some(1)
 ```
 
 ### fill
@@ -674,7 +699,27 @@ console.log(list); // outputs [4, 4, 4]
 Rust:
 
 ```rust
-// TODO
+let list = vec![4; 3];
+println!("{:?}", list); // outputs [4, 4, 4]
+```
+
+Rust, with an array instead of a `Vec`:
+
+```rust
+let list = [4; 3];
+println!("{:?}", list); // outputs [4, 4, 4]
+```
+
+Rust, modifying a preexisting `Vec` (this works with arrays too):
+
+```rust
+let mut list = vec![1, 2, 3];
+println!("{:?}", list); // outputs [1, 2, 3]
+
+for item in &mut list {
+    *item = 4;
+}
+println!("{:?}", list); // outputs [4, 4, 4]
 ```
 
 ### entries and keys
@@ -701,10 +746,48 @@ for(let item of list.keys()) {
 // 3
 ```
 
-Rust:
+Rust, with a `Vec`:
 
 ```rust
-// TODO
+let list = vec![Some("a"), Some("b"), None, Some("c")];
+for item in list.iter().enumerate() {
+    println!("{:?}", item);
+}
+// outputs:
+// (0, Some("a"))
+// (1, Some("b"))
+// (2, None)
+// (3, Some("c"))
+```
+
+Rust, with a map:
+
+```rust
+use ::std::collections::HashMap;
+
+let map = {
+    let mut map = HashMap::with_capacity(3);
+    map.insert(0, "a");
+    map.insert(1, "b");
+    map.insert(3, "c");
+    map
+};
+// You can alternately create `map` using hashmap![] from the maplit crate, like so:
+//let map = hashmap![0 => "a", 1 => "b", 3 => "c"];
+for pair in &map {
+    println!("{:?}", pair);
+}
+// outputs:
+// (1, Some("b"))
+// (0, Some("a"))
+// (3, Some("c"))
+for key in map.keys() {
+    println!("{}", key);
+}
+// outputs:
+// 1
+// 0
+// 3
 ```
 
 ### includes
@@ -716,10 +799,11 @@ let list = [1, 2, 3];
 console.log(list.includes(2)); // outputs true
 ```
 
-Rust:
+Rust (also works with slices):
 
 ```rust
-// TODO
+let list = vec![1, 2, 3];
+println!("{}", list.contains(&2)); // outputs true
 ```
 
 ### Iterating over the elements in a list
@@ -753,7 +837,8 @@ console.log(Array.from("foo")); // outputs ["f", "o", "o"]
 Rust:
 
 ```rust
-// TODO
+let list: Vec<_> = "foo".chars().collect();
+println!("{:?}", list); // outputs ['f', 'o', 'o']
 ```
 
 ## Object literals
@@ -764,12 +849,63 @@ JavaScript:
 const data = {
   prop: "value"
 }
+console.log(data); // outputs Object { prop: "value" }
+console.log(data.prop); // outputs value
 ```
 
-Rust:
+Rust doesn't have a direct equivalent of this.
+
+If you want a proper object, you need to declare a type:
 
 ```rust
-// TODO
+#[derive(Debug, Clone)]
+pub struct Data {
+    prop: String,
+}
+
+let data = Data { prop: String::from("value") };
+println!("{:?}", data); // outputs Data { prop: "value" }
+println!("{:?}", data.prop); // outputs "value"
+```
+
+Most structs have private fields, but if you want client code to be able to access fields directly, you need to make them public:
+
+```rust
+#[derive(Debug, Clone)]
+pub struct Data {
+    pub prop: String,
+//  ^^^
+}
+```
+
+Or you can use a tuple, which is more ad-hoc:
+
+```rust
+let data = (String::from("value"),);
+println!("{:?}", data); // outputs ("value",)
+println!("{:?}", data.0); // outputs "value"
+```
+
+If you want a map, use a map:
+
+```rust
+use ::std::collections::HashMap;
+
+let data = {
+    let mut map = HashMap::with_capacity(1);
+    map.insert(String::from("prop"), String::from("value"));
+    map
+};
+println!("{:?}", data); // outputs {"prop": "value"}
+println!("{:?}", data["prop"]); // outputs "value"
+```
+
+The maplit crate provides a more ergonomic way to create maps:
+
+```rust
+let data = hashmap![String::from("prop") => String::from("value")];
+println!("{:?}", data); // outputs {"prop": "value"}
+println!("{:?}", data["prop"]); // outputs "value"
 ```
 
 ## Combining filter, map, reduce
@@ -1012,6 +1148,7 @@ JavaScript:
 
 ```
 const map = new Map([["a", "b"]]);
+
 map.size; // 1
 map.get("a"); // "b"
 map.has("a"); // true
@@ -1026,7 +1163,25 @@ map.entries(); // Array of arrays
 Rust:
 
 ```rust
-// TODO
+use ::std::collections::HashMap;
+let mut map = HashMap::with_capacity(1);
+map.insert(String::from("a"), String::from("b"));
+// or, with the maplit crate:
+//let mut map = hashmap![
+//    String::from("a") => String::from("b"),
+//];
+
+map.len(); // 1
+map.get("a"); // Some("b")
+map.contains_key("a"); // true
+map.insert("c".into(), "d".into());
+map.remove("a"); // String::from("b")
+map.keys(); // keys iterator
+map.values(); // values iterator
+map.clear(); // clears
+map.iter(); // iterator of two-tuples (ref_key, ref_value)
+// also iter_mut(), which gives you an iterator of mutable references instead
+// also into_iter(), which consumes the map and gives you an iterator of the original objects
 ```
 
 ### WeakMap
@@ -1060,6 +1215,7 @@ JavaScript:
 
 ```JS
 const set = new Set(["a", "b", "c"]);
+
 set.size; // 3
 set.has("d"); // false
 set.add("d");
@@ -1073,7 +1229,20 @@ set.clear();
 Rust:
 
 ```rust
-// TODO
+use ::std::collections::HashSet;
+let mut set = HashSet::with_capacity(3);
+set.insert(String::from("a"));
+set.insert("b".into());
+set.insert("c".into());
+
+set.len(); // 3
+set.contains("d"); // false
+set.add("d".into());
+set.remove("a");
+for item in &set { println!("{:?}", (item, item)); }
+for item in &set { println!("{:?}", item); }
+for item in &set { println!("{:?}", item); }
+set.clear();
 ```
 
 ### WeakSet
@@ -1110,7 +1279,14 @@ console.log(b); // outputs, e.g., My name is Marcos and today is Tue, 08 Dec 201
 Rust:
 
 ```rust
-// TODO
+extern crate chrono;
+use ::std::time::SystemTime;
+use ::chrono::{DateTime, Utc};
+
+let now: DateTime<Utc> = SystemTime::now().into();
+let name = "Marcos";
+// Use println!() directly: creating a String with format!() would allocate and copy needlessly.
+println!("My name is {} and today is {}", name, now); // outputs, e.g., My name is Marcos and today is 2018-07-27 12:15:13.899477646 UTC
 ```
 
 ## Modules
@@ -1125,7 +1301,9 @@ y();
 Rust:
 
 ```rust
-// TODO
+extern crate some_crate;
+use ::some_crate::x as y;
+y();
 ```
 
 ## Rest and spread
@@ -1156,8 +1334,15 @@ console.log(props); // outputs {y: "hello", "z": hello}
 Rust:
 
 ```rust
-// TODO
+struct Whatever { x: String, y: String, z: String }
+let whatever = Whatever { x: "hi".into(), y: "hello".into(), z: "hello".into() };
+let Whatever { x, .. } = whatever;
+println!("{}", x); // outputs "hi"
 ```
+
+Note: You can't destructure using `..foo` and get an object with `y` and `z` fields,
+because Rust doesn't have anonymous types like that (see the Object Literals section)
+You _can_ use `..` to discard the other fields when destructuring, though.
 
 ## Array comprehension
 
@@ -1168,10 +1353,11 @@ let values = [1, 2, 3];
 let newList = [x * x for x of values];
 ```
 
-Rust:
+Rust doesn't have comprehensions, but you can use `into_iter()`, iterator adapters, and `collect()`:
 
 ```rust
-// TODO
+let values = vec![1, 2, 3];
+let new_list: Vec<_> = values.into_iter().map(|x| x * x).collect();
 ```
 
 ## Math
