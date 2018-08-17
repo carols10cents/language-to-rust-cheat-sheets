@@ -677,13 +677,13 @@ let index = list.iter().position(|item| item.foo == 3);
 println!("{:?}", index); // outputs Some(1)
 ```
 
-Rust, but using tuples to make ad-hoc objects instead of having to define a struct:
+If it doesn't make sense to define a struct (if, say, these objects are more of a one-off than a part of the API or something that's used in many places), you can use tuples instead:
 
 ```rust
-let list = vec![("foo", 1), ("foo", 3), ("foo", 2)];
-let obj3 = list.iter().find(|(_, n)| *n == 2);
-println!("{:?}", obj3); // outputs Some(("foo", 2))
-let index = list.iter().position(|(_, n)| *n == 3);
+let list = vec![(1,), (3,), (2,)];
+let obj3 = list.iter().find(|(n,)| *n == 2);
+println!("{:?}", obj3); // outputs Some((2,))
+let index = list.iter().position(|(n,)| *n == 3);
 println!("{:?}", index); // outputs Some(1)
 ```
 
